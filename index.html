@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vet INC — Veterinary Pricing Operations</title>
+  <!-- VISION-CONCEPT-02 -->
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:         #F8F6F2;
+      --bg-dark:    #EFECE7;
+      --surface:    #FFFFFF;
+      --border:     #DDD8D0;
+      --text:       #1A1816;
+      --text-mid:   #5A534A;
+      --text-dim:   #8A8178;
+
+      --navy:       #1B3660;
+      --navy-hi:    #2B5299;
+      --navy-tint:  #EEF2F8;
+      --navy-rule:  #B8C8DF;
+
+      --green:      #2A6347;
+      --green-hi:   #3D8A64;
+      --green-tint: #EEF5F1;
+      --green-rule: #AACFBB;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    .visually-hidden {
+      position: absolute; width: 1px; height: 1px;
+      padding: 0; margin: -1px; overflow: hidden;
+      clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--navy-hi);
+      outline-offset: 3px;
+      border-radius: 2px;
+    }
+
+    a { color: var(--navy-hi); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* ---- Nav ---- */
+    .site-nav {
+      position: sticky; top: 0; z-index: 200;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-inner {
+      max-width: 1200px; margin: 0 auto;
+      padding: 0 1.75rem;
+      display: flex; align-items: center;
+      justify-content: space-between; height: 60px; gap: 1.5rem;
+    }
+    .nav-wordmark {
+      font-size: 0.9375rem; font-weight: 800;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--text); flex-shrink: 0;
+    }
+    .nav-links {
+      display: flex; list-style: none; gap: 1.875rem;
+    }
+    .nav-links a {
+      font-size: 0.8125rem; color: var(--text-mid);
+      letter-spacing: 0.03em; transition: color 0.15s;
+    }
+    .nav-links a:hover { color: var(--text); text-decoration: none; }
+    .nav-actions {
+      display: flex; gap: 0.75rem; align-items: center;
+    }
+    .btn-navy {
+      display: inline-flex; align-items: center;
+      padding: 0.45rem 1.125rem;
+      background: var(--navy); color: #fff;
+      border-radius: 3px; font-size: 0.8125rem; font-weight: 600;
+      letter-spacing: 0.03em; transition: background 0.15s;
+    }
+    .btn-navy:hover { background: var(--navy-hi); text-decoration: none; }
+    .nav-hamburger {
+      display: none; background: none;
+      border: 1px solid var(--border); color: var(--text);
+      padding: 0.35rem 0.55rem; border-radius: 3px;
+      cursor: pointer; font-size: 1.1rem; line-height: 1;
+    }
+    .nav-drawer {
+      display: none; flex-direction: column;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+    }
+    .nav-drawer a {
+      display: block; padding: 0.85rem 1.75rem;
+      color: var(--text-mid); font-size: 0.9375rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-drawer a:hover { background: var(--bg); text-decoration: none; }
+    .nav-drawer .btn-navy {
+      margin: 1rem 1.75rem; align-self: flex-start;
+      display: inline-flex;
+    }
+
+    @media (max-width: 760px) {
+      .nav-links, .nav-actions { display: none; }
+      .nav-hamburger { display: block; }
+      .nav-drawer.is-open { display: flex; }
+    }
+
+    /* ---- Utility ---- */
+    .container {
+      max-width: 1200px; margin: 0 auto; padding: 0 1.75rem;
+    }
+
+    /* ---- HERO ---- */
+    .hero {
+      padding: 5.5rem 0 4rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .hero-inner {
+      max-width: 1200px; margin: 0 auto; padding: 0 1.75rem;
+    }
+    .eyebrow {
+      display: inline-block;
+      font-size: 0.69rem; font-weight: 700;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--text-dim); margin-bottom: 1.375rem;
+    }
+    .hero h1 {
+      font-size: clamp(2rem, 4.75vw, 3.375rem);
+      font-weight: 700; line-height: 1.13;
+      letter-spacing: -0.025em;
+      max-width: 860px; margin-bottom: 1.5rem;
+    }
+    .hero h1 em {
+      font-style: normal; color: var(--navy);
+    }
+    .hero-sub {
+      font-size: 1.0625rem; color: var(--text-mid);
+      max-width: 560px; line-height: 1.75; margin-bottom: 1.5rem;
+    }
+    .hero-paths-label {
+      font-size: 0.75rem; font-weight: 600;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--text-dim); margin-top: 3rem; margin-bottom: 1rem;
+    }
+    .hero-track-row {
+      display: flex; gap: 0.75rem; flex-wrap: wrap;
+    }
+    .hero-track {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: 3px; background: var(--bg);
+      font-size: 0.8125rem; font-weight: 600; color: var(--text-mid);
+      letter-spacing: 0.02em;
+    }
+    .hero-track-dot {
+      width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+    }
+    .hero-track-dot.navy { background: var(--navy); }
+    .hero-track-dot.green { background: var(--green); }
+
+    /* ---- Split paths ---- */
+    .paths-section {
+      padding: 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .paths-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    @media (max-width: 760px) {
+      .paths-grid { grid-template-columns: 1fr; }
+    }
+
+    .path-panel {
+      padding: 4rem 2.5rem;
+      border-right: 1px solid var(--border);
+    }
+    .path-panel:last-child { border-right: none; }
+
+    @media (max-width: 760px) {
+      .path-panel {
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+        padding: 3rem 1.75rem;
+      }
+      .path-panel:last-child { border-bottom: none; }
+    }
+
+    .path-panel.navy-path { background: var(--navy-tint); }
+    .path-panel.green-path { background: var(--green-tint); }
+
+    .path-tag {
+      display: inline-block;
+      font-size: 0.68rem; font-weight: 700;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      padding: 0.25rem 0.65rem; border-radius: 2px;
+      margin-bottom: 1.5rem;
+    }
+    .path-tag.navy { background: var(--navy); color: #fff; }
+    .path-tag.green { background: var(--green); color: #fff; }
+
+    .path-heading {
+      font-size: clamp(1.25rem, 2.5vw, 1.625rem);
+      font-weight: 700; letter-spacing: -0.015em;
+      line-height: 1.25; margin-bottom: 1rem;
+    }
+    .path-panel.navy-path .path-heading { color: var(--navy); }
+    .path-panel.green-path .path-heading { color: var(--green); }
+
+    .path-body {
+      font-size: 0.9375rem; color: var(--text-mid);
+      line-height: 1.72; margin-bottom: 2rem;
+    }
+
+    .path-features {
+      list-style: none; display: flex; flex-direction: column; gap: 0.625rem;
+      margin-bottom: 2rem;
+    }
+    .path-features li {
+      display: flex; gap: 0.625rem; align-items: flex-start;
+      font-size: 0.875rem; color: var(--text-mid); line-height: 1.5;
+    }
+    .feat-bullet {
+      flex-shrink: 0; margin-top: 0.25rem;
+      width: 5px; height: 5px; border-radius: 50%;
+    }
+    .feat-bullet.navy { background: var(--navy); }
+    .feat-bullet.green { background: var(--green); }
+
+    .path-cta {
+      display: inline-flex; align-items: center;
+      padding: 0.65rem 1.5rem;
+      border-radius: 3px; font-size: 0.875rem; font-weight: 600;
+      letter-spacing: 0.025em; transition: background 0.15s, color 0.15s;
+    }
+    .path-cta.navy-cta {
+      background: var(--navy); color: #fff;
+    }
+    .path-cta.navy-cta:hover { background: var(--navy-hi); text-decoration: none; }
+    .path-cta.green-cta {
+      background: var(--green); color: #fff;
+    }
+    .path-cta.green-cta:hover { background: var(--green-hi); text-decoration: none; }
+
+    .path-note {
+      margin-top: 1rem;
+      font-size: 0.8rem; color: var(--text-dim); line-height: 1.5;
+    }
+    .path-note a { color: inherit; text-decoration: underline; }
+
+    /* ---- Shared foundation ---- */
+    .shared-section {
+      padding: 4.5rem 0;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .section-label {
+      font-size: 0.69rem; font-weight: 700;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--text-dim); margin-bottom: 1rem;
+    }
+    .section-heading {
+      font-size: clamp(1.375rem, 2.75vw, 1.875rem);
+      font-weight: 700; letter-spacing: -0.018em;
+      line-height: 1.22; margin-bottom: 1rem;
+    }
+    .section-body {
+      color: var(--text-mid); max-width: 600px;
+      line-height: 1.75; margin-bottom: 2.5rem;
+    }
+
+    .shared-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.5rem;
+    }
+    .shared-card {
+      border: 1px solid var(--border);
+      padding: 1.625rem;
+      background: var(--bg);
+    }
+    .shared-card-icon {
+      font-size: 1.1rem; margin-bottom: 0.75rem; display: block;
+    }
+    .shared-card-title {
+      font-size: 0.875rem; font-weight: 700;
+      margin-bottom: 0.4rem; color: var(--text);
+    }
+    .shared-card-body {
+      font-size: 0.84375rem; color: var(--text-mid); line-height: 1.6;
+    }
+
+    /* ---- Caveat / honesty row ---- */
+    .caveat-row {
+      padding: 2.5rem 0;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-dark);
+    }
+    .caveat-inner {
+      max-width: 1200px; margin: 0 auto; padding: 0 1.75rem;
+      display: flex; gap: 1rem; align-items: flex-start;
+    }
+    .caveat-bar {
+      flex-shrink: 0; width: 3px; background: var(--border);
+      align-self: stretch; border-radius: 2px;
+    }
+    .caveat-text {
+      font-size: 0.875rem; color: var(--text-mid); line-height: 1.7;
+    }
+    .caveat-text strong { color: var(--text); font-weight: 600; }
+
+    /* ---- CTA ---- */
+    .cta-section {
+      padding: 5rem 0;
+      text-align: center;
+      background: var(--surface);
+    }
+    .cta-section h2 {
+      font-size: clamp(1.5rem, 3vw, 2.25rem);
+      font-weight: 700; letter-spacing: -0.02em; margin-bottom: 1rem;
+    }
+    .cta-section p {
+      color: var(--text-mid); max-width: 460px;
+      margin: 0 auto 2.5rem; line-height: 1.7;
+    }
+    .cta-pair {
+      display: flex; gap: 1rem; flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    /* ---- Footer ---- */
+    .site-footer {
+      border-top: 1px solid var(--border);
+      padding: 1.875rem 1.75rem;
+      background: var(--bg);
+    }
+    .footer-inner {
+      max-width: 1200px; margin: 0 auto;
+      display: flex; justify-content: space-between;
+      align-items: center; flex-wrap: wrap; gap: 0.75rem;
+    }
+    .footer-word {
+      font-size: 0.8125rem; font-weight: 800;
+      letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-mid);
+    }
+    .footer-note { font-size: 0.79rem; color: var(--text-dim); }
+  </style>
+</head>
+<body>
+
+  <span class="visually-hidden">VISION-CONCEPT-02</span>
+
+  <!-- Navigation -->
+  <header>
+    <nav class="site-nav" aria-label="Primary navigation">
+      <div class="nav-inner">
+        <a class="nav-wordmark" href="#" aria-label="Vet INC home">Vet INC</a>
+        <ul class="nav-links" role="list">
+          <li><a href="#veterinary-groups">Veterinary groups</a></li>
+          <li><a href="#independent-clinics">Independent clinics</a></li>
+          <li><a href="#foundation">Our approach</a></li>
+        </ul>
+        <div class="nav-actions">
+          <a class="btn-navy" href="mailto:hello@vetinc.ca">Get in touch</a>
+        </div>
+        <button
+          class="nav-hamburger"
+          id="nav-toggle"
+          aria-expanded="false"
+          aria-controls="nav-drawer"
+          aria-label="Open navigation menu"
+        >&#9776;</button>
+      </div>
+      <div class="nav-drawer" id="nav-drawer" role="navigation" aria-label="Mobile menu">
+        <a href="#veterinary-groups">Veterinary groups</a>
+        <a href="#independent-clinics">Independent clinics</a>
+        <a href="#foundation">Our approach</a>
+        <a class="btn-navy" href="mailto:hello@vetinc.ca">Get in touch</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+
+    <!-- Hero -->
+    <div class="hero">
+      <div class="hero-inner">
+        <p class="eyebrow">Veterinary pricing operations</p>
+        <h1>Pricing operations built for <em>how veterinary businesses actually work.</em></h1>
+        <p class="hero-sub">
+          Vet INC serves two distinct parts of the veterinary industry. The product you need depends on how your business is structured&mdash;choose your path below.
+        </p>
+        <p class="hero-paths-label">Two tracks, one discipline</p>
+        <div class="hero-track-row">
+          <span class="hero-track">
+            <span class="hero-track-dot navy" aria-hidden="true"></span>
+            Veterinary groups &amp; multi-site operators
+          </span>
+          <span class="hero-track">
+            <span class="hero-track-dot green" aria-hidden="true"></span>
+            Independent clinics &amp; small groups
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Split paths -->
+    <section class="paths-section" aria-labelledby="paths-heading">
+      <h2 class="visually-hidden" id="paths-heading">Choose your path</h2>
+      <div class="paths-grid">
+
+        <!-- Groups path -->
+        <div class="path-panel navy-path" id="veterinary-groups">
+          <span class="path-tag navy">Veterinary groups</span>
+          <h3 class="path-heading">Controlled implementation of approved price changes across your group</h3>
+          <p class="path-body">
+            For corporate operators and multi-site groups, Vet INC provides a structured authorization-to-implementation workflow. Every fee change is explicitly approved, mapped to PMS catalogue entries, released in controlled rollouts, and recorded with a full audit trail.
+          </p>
+          <ul class="path-features" aria-label="Key capabilities">
+            <li>
+              <span class="feat-bullet navy" aria-hidden="true"></span>
+              Stakeholder authorization before any change proceeds
+            </li>
+            <li>
+              <span class="feat-bullet navy" aria-hidden="true"></span>
+              PMS catalogue mapping across all locations
+            </li>
+            <li>
+              <span class="feat-bullet navy" aria-hidden="true"></span>
+              Exception management and rollout status tracking
+            </li>
+            <li>
+              <span class="feat-bullet navy" aria-hidden="true"></span>
+              Tamper-evident audit history for every action
+            </li>
+            <li>
+              <span class="feat-bullet navy" aria-hidden="true"></span>
+              Controlled PMS writeback (planned; contractually governed)
+            </li>
+          </ul>
+          <a class="path-cta navy-cta" href="mailto:hello@vetinc.ca">Talk to us about your group</a>
+          <p class="path-note">
+            Live PMS writeback is in development and not yet available. All implementation scopes are agreed individually.
+          </p>
+        </div>
+
+        <!-- Clinics path -->
+        <div class="path-panel green-path" id="independent-clinics">
+          <span class="path-tag green">Independent clinics</span>
+          <h3 class="path-heading">FeeWatch: historical context for your pricing-review cadence</h3>
+          <p class="path-body">
+            For independent practices and small groups, FeeWatch adds historical context to your fee reviews by studying your clinic&rsquo;s own sales, revenue, and visit records. It supports a manageable, recurring review routine&mdash;it does not set prices or make automatic recommendations.
+          </p>
+          <ul class="path-features" aria-label="Key capabilities">
+            <li>
+              <span class="feat-bullet green" aria-hidden="true"></span>
+              Historical context drawn from your own data
+            </li>
+            <li>
+              <span class="feat-bullet green" aria-hidden="true"></span>
+              Supports a regular pricing-review cadence
+            </li>
+            <li>
+              <span class="feat-bullet green" aria-hidden="true"></span>
+              Sales, revenue, and visit records in context
+            </li>
+            <li>
+              <span class="feat-bullet green" aria-hidden="true"></span>
+              Decisions remain with your team, on your schedule
+            </li>
+          </ul>
+          <a class="path-cta green-cta" href="mailto:hello@vetinc.ca">Ask about FeeWatch</a>
+          <p class="path-note">
+            FeeWatch provides historical context to inform decisions. It does not guarantee outcomes or replace clinical or financial judgement.
+          </p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Shared foundation -->
+    <section class="shared-section" id="foundation" aria-labelledby="found-heading">
+      <div class="container">
+        <p class="section-label">Our approach</p>
+        <h2 class="section-heading" id="found-heading">A shared discipline, whatever your scale</h2>
+        <p class="section-body">
+          Both products are built on the same principle: pricing decisions belong to your team, and the tools should give them better information and more control&mdash;not less.
+        </p>
+        <div class="shared-grid">
+          <div class="shared-card">
+            <span class="shared-card-icon" aria-hidden="true">&#9744;</span>
+            <p class="shared-card-title">Authorization before action</p>
+            <p class="shared-card-body">Nothing changes without explicit sign-off from the people responsible for it. The system enforces the sequence; it does not skip steps.</p>
+          </div>
+          <div class="shared-card">
+            <span class="shared-card-icon" aria-hidden="true">&#128196;</span>
+            <p class="shared-card-title">Your data, your decisions</p>
+            <p class="shared-card-body">Vet INC uses the records your clinics already generate. There are no external benchmarks, no manufactured metrics, and no claim that the tool makes decisions for you.</p>
+          </div>
+          <div class="shared-card">
+            <span class="shared-card-icon" aria-hidden="true">&#128202;</span>
+            <p class="shared-card-title">Context, not conclusions</p>
+            <p class="shared-card-body">The output of both products is better-informed people, not automated outcomes. Pricing requires judgement; the tools support it.</p>
+          </div>
+          <div class="shared-card">
+            <span class="shared-card-icon" aria-hidden="true">&#128203;</span>
+            <p class="shared-card-title">Audit and record</p>
+            <p class="shared-card-body">Every significant action is recorded. Whether you are managing a ten-clinic group or a single practice, you should be able to see what happened and when.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Caveat row -->
+    <div class="caveat-row">
+      <div class="caveat-inner">
+        <div class="caveat-bar" aria-hidden="true"></div>
+        <p class="caveat-text">
+          <strong>A note on what these tools do not do:</strong> Neither product replaces your pricing, finance, or analytics team, makes automatic price changes, or guarantees specific outcomes. FeeWatch surfaces historical patterns in your own data&mdash;what your team does with that context is your decision. The enterprise platform enforces a controlled workflow; it does not make choices on your behalf.
+        </p>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <section class="cta-section" aria-labelledby="cta-heading">
+      <h2 id="cta-heading">Not sure which path fits?</h2>
+      <p>Send us a note and describe how your business is structured. We&rsquo;ll tell you honestly whether either product is a fit right now.</p>
+      <div class="cta-pair">
+        <a class="path-cta navy-cta" href="mailto:hello@vetinc.ca">hello@vetinc.ca</a>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span class="footer-word">Vet INC</span>
+      <p class="footer-note">Veterinary pricing operations &mdash; Canada &amp; North America</p>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      var toggle = document.getElementById('nav-toggle');
+      var drawer = document.getElementById('nav-drawer');
+      if (!toggle || !drawer) return;
+
+      toggle.addEventListener('click', function () {
+        var open = drawer.classList.toggle('is-open');
+        toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+        toggle.setAttribute('aria-label', open ? 'Close navigation menu' : 'Open navigation menu');
+      });
+
+      drawer.querySelectorAll('a').forEach(function (link) {
+        link.addEventListener('click', function () {
+          drawer.classList.remove('is-open');
+          toggle.setAttribute('aria-expanded', 'false');
+          toggle.setAttribute('aria-label', 'Open navigation menu');
+        });
+      });
+    }());
+  </script>
+
+</body>
+</html>
